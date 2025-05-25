@@ -1,1 +1,109 @@
-using System;\nusing System.Collections.Generic;\nusing System.Threading.Tasks;\n\nnamespace OnboardingSystem\n{\n    public class User\n    {\n        public string Name { get; set; }\n        public string Email { get; set; }\n        public string PhoneNumber { get; set; }\n        public string Address { get; set; }\n    }\n\n    public interface IFormFillerService\n    {\n        Task<Dictionary<string, string>> GetPreFilledDataAsync(User user);\n    }\n\n    public class FormFillerService : IFormFillerService\n    {\n        public async Task<Dictionary<string, string>> GetPreFilledDataAsync(User user)\n        {\n            // Simulate fetching data from a database or external service\n            await Task.Delay(100); // Simulate async operation\n            return new Dictionary<string, string>\n            {\n                { \"Name\", user.Name },\n                { \"Email\", user.Email },\n                { \"PhoneNumber\", user.PhoneNumber },\n                { \"Address\", user.Address }\n            };\n        }\n    }\n\n    public interface INavigationService\n    {\n        Task<string> GetNextStepAsync(string currentStep);\n    }\n\n    public class NavigationService : INavigationService\n    {\n        private readonly Dictionary<string, string> _navigationSteps = new Dictionary<string, string>\n        {\n            { \"Start\", \"PersonalInfo\" },\n            { \"PersonalInfo\", \"ContactDetails\" },\n            { \"ContactDetails\", \"Review\" },\n            { \"Review\", \"Complete\" }\n        };\n\n        public async Task<string> GetNextStepAsync(string currentStep)\n        {\n            await Task.Delay(50); // Simulate async operation\n            return _navigationSteps.ContainsKey(currentStep) ? _navigationSteps[currentStep] : \"Complete\";\n        }\n    }\n\n    public class OnboardingProcess\n    {\n        private readonly IFormFillerService _formFillerService;\n        private readonly INavigationService _navigationService;\n\n        public OnboardingProcess(IFormFillerService formFillerService, INavigationService navigationService)\n        {\n            _formFillerService = formFillerService;\n            _navigationService = navigationService;\n        }\n\n        public async Task StartOnboardingAsync(User user)\n        {\n            string currentStep = \"Start\";\n            while (currentStep != \"Complete\")\n            {\n                var preFilledData = await _formFillerService.GetPreFilledDataAsync(user);\n                Console.WriteLine($\"Current Step: {currentStep}\");\n                Console.WriteLine(\"Pre-filled Data:\");\n                foreach (var data in preFilledData)\n                {\n                    Console.WriteLine($\"{data.Key}: {data.Value}\");\n                }\n\n                currentStep = await _navigationService.GetNextStepAsync(currentStep);\n                Console.WriteLine($\"Navigating to: {currentStep}\");\n            }\n\n            Console.WriteLine(\"Onboarding Complete!\");\n        }\n    }\n\n    class Program\n    {\n        static async Task Main(string[] args)\n        {\n            var user = new User\n            {\n                Name = \"John Doe\",\n                Email = \"john.doe@example.com\",\n                PhoneNumber = \"123-456-7890\",\n                Address = \"123 Main St\"\n            };\n\n            var formFillerService = new FormFillerService();\n            var navigationService = new NavigationService();\n            var onboardingProcess = new OnboardingProcess(formFillerService, navigationService);\n\n            await onboardingProcess.StartOnboardingAsync(user);\n        }\n    }\n}
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace OnboardingSystem
+{
+    public class User
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
+        public string Address { get; set; }
+    }
+
+    public interface IFormFillerService
+    {
+        Task<Dictionary<string, string>> GetPreFilledDataAsync(User user);
+    }
+
+    public class FormFillerService : IFormFillerService
+    {
+        public async Task<Dictionary<string, string>> GetPreFilledDataAsync(User user)
+        {
+            // Simulate fetching data from a database or external service
+            await Task.Delay(100); // Simulate async operation
+            return new Dictionary<string, string>
+            {
+                { "Name", user.Name },
+                { "Email", user.Email },
+                { "PhoneNumber", user.PhoneNumber },
+                { "Address", user.Address }
+            };
+        }
+    }
+
+    public interface INavigationService
+    {
+        Task<string> GetNextStepAsync(string currentStep);
+    }
+
+    public class NavigationService : INavigationService
+    {
+        private readonly Dictionary<string, string> _navigationSteps = new Dictionary<string, string>
+        {
+            { "Start", "PersonalInfo" },
+            { "PersonalInfo", "ContactDetails" },
+            { "ContactDetails", "Review" },
+            { "Review", "Complete" }
+        };
+
+        public async Task<string> GetNextStepAsync(string currentStep)
+        {
+            await Task.Delay(50); // Simulate async operation
+            return _navigationSteps.ContainsKey(currentStep) ? _navigationSteps[currentStep] : "Complete";
+        }
+    }
+
+    public class OnboardingProcess
+    {
+        private readonly IFormFillerService _formFillerService;
+        private readonly INavigationService _navigationService;
+
+        public OnboardingProcess(IFormFillerService formFillerService, INavigationService navigationService)
+        {
+            _formFillerService = formFillerService;
+            _navigationService = navigationService;
+        }
+
+        public async Task StartOnboardingAsync(User user)
+        {
+            string currentStep = "Start";
+            while (currentStep != "Complete")
+            {
+                var preFilledData = await _formFillerService.GetPreFilledDataAsync(user);
+                Console.WriteLine($"Current Step: {currentStep}");
+                Console.WriteLine("Pre-filled Data:");
+                foreach (var data in preFilledData)
+                {
+                    Console.WriteLine($"{data.Key}: {data.Value}");
+                }
+
+                currentStep = await _navigationService.GetNextStepAsync(currentStep);
+                Console.WriteLine($"Navigating to: {currentStep}");
+            }
+
+            Console.WriteLine("Onboarding Complete!");
+        }
+    }
+
+    class Program
+    {
+        static async Task Main(string[] args)
+        {
+            var user = new User
+            {
+                Name = "John Doe",
+                Email = "john.doe@example.com",
+                PhoneNumber = "123-456-7890",
+                Address = "123 Main St"
+            };
+
+            var formFillerService = new FormFillerService();
+            var navigationService = new NavigationService();
+            var onboardingProcess = new OnboardingProcess(formFillerService, navigationService);
+
+            await onboardingProcess.StartOnboardingAsync(user);
+        }
+    }
+}
